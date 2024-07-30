@@ -1,9 +1,7 @@
 // import multer from "multer";
 // import { findConfigurationByIp } from "../models/Surveillance";
-
 // const fs = require("fs");
 // const path = require("path");
-
 // const storage = multer.diskStorage({
 //   destination: (req, file, cb) => {
 //     const ip = req.ip.match(/\d+\.\d+\.\d+\.\d+/)
@@ -23,11 +21,9 @@
 //         "/" +
 //         date.getDate()
 //     );
-
 //     if (!fs.existsSync(dir)) {
 //       fs.mkdirSync(dir, { recursive: true });
 //     }
-
 //     const partPath =
 //       "screens/" +
 //       ip +
@@ -37,9 +33,7 @@
 //       (date.getMonth() + 1) +
 //       "/" +
 //       date.getDate();
-
 //     req.body = { ...req.body, fileName: partPath };
-
 //     cb(null, dir);
 //   },
 //   filename: (req, file, cb) => {
@@ -58,5 +52,5 @@
 //     req.body = { ...req.body, fileName: req.body.fileName + "/" + fn };
 //   },
 // });
-
 // export const upload = multer({ storage });
+//# sourceMappingURL=helper.js.map
