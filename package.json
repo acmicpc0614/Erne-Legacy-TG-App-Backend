@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "ts-node src/server.ts",
+    "build": "tsc",
     "server": "tsc && nodemon dist/server.js",
     "production": "set PORT=80&&set ENVIRONMENT=PRODUCTION&&ts-node src/server.ts"
   },
