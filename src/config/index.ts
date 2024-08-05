@@ -1,5 +1,5 @@
 export default {
-  mongoURI: "mongodb+srv://walter:nEObatlD6OcCVGaF@walter.iiya7fr.mongodb.net/mike-token-game",
+  mongoURI: "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.2.10",
   jwtSecret: "kut10developers",
   githubToken: "<yoursecrectaccesstoken>",
 };
