@@ -4,6 +4,7 @@ import Earnings from "../../models/Earnings";
 const router: Router = express.Router();
 
 router.post('/add', async (req: Request, res: Response) => {
+    console.log("?????????????")
     const newUser = new Earnings({
         username: req.body.username,
     })
