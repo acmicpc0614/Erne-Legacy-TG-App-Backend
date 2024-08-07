@@ -1,6 +1,9 @@
 // import multer from "multer";
 // import { findConfigurationByIp } from "../models/Surveillance";
 
+import Wallet from "../models/Wallet";
+import { LevelData, PointLimits } from "./levelData";
+
 // const fs = require("fs");
 // const path = require("path");
 
@@ -60,3 +63,22 @@
 // });
 
 // export const upload = multer({ storage });
+
+function lowerBound(arr: any[], target: number): number {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].totalPoint >= target) {
+      return arr[i].level;
+    }
+  }
+  return arr.length;
+}
+
+export const updateLevel = async (username: string, totalPoint: number) => {
+  const index: number = lowerBound(LevelData, totalPoint);
+
+  await Wallet.findOneAndUpdate({
+    username: username,
+    totalPoint: totalPoint,
+    level: LevelData[index - 1].level,
+  });
+};

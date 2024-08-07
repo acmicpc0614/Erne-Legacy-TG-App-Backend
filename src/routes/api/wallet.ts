@@ -1,5 +1,6 @@
 import express, { Router, Request, Response } from "express";
 import Wallet from "../../models/Wallet";
+import { updateLevel } from "../../utils/helper";
 
 const router: Router = express.Router();
 
@@ -25,13 +26,15 @@ router.post("/add", async (req: Request, res: Response) => {
 router.post("/update/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
   console.log("update =>", req.body);
+  updateLevel(req.params.username, req.body.totalPoint);
+
   if (wallet) {
     const updated_wallet = await Wallet.findOneAndUpdate({
       username: req.params.username,
       totalPoint: req.body.totalPoint,
       balance: req.body.balance,
     });
-    console.log("--------------test----------", updated_wallet.totalPoint);
+    console.log("--------------update----------", updated_wallet.level);
     const return_wallet = {
       _id: updated_wallet._id,
       username: updated_wallet.username,
@@ -103,7 +106,7 @@ router.post("/updateTap/:username", async (req: Request, res: Response) => {
     return res.status(400).json({ msg: "You have no permission" });
   }
 });
-/*
+
 router.post("/updateLimit/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
   console.log("updateLimit =>", req.body);
@@ -153,7 +156,7 @@ router.post("/updateBalance/:username", async (req: Request, res: Response) => {
   }
 });
 router.get("/all", async (req: Request, res: Response) => {
-  const users = await Wallet.find().limit(5).sort({ balance: -1 });
+  const users = await Wallet.find().limit(5).sort({ totalPoint: -1 });
   res.json(users);
 });
 router.post("/:username", async (req: Request, res: Response) => {
@@ -172,7 +175,6 @@ router.delete("/delete/:username", async (req: Request, res: Response) => {
   await Wallet.deleteOne({ _id: req.params.username });
   res.json({ msg: "Delete Successfully" });
 });
-*/
 
 router.post("/test", (req: Request, res: Response) => {
   res.send("wallet router is working...");
