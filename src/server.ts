@@ -2,11 +2,11 @@ import express, { Express } from "express";
 import cors from "cors";
 
 import user from "./routes/api/user";
-import wallet from "./routes/api/wallet"
+import wallet from "./routes/api/wallet";
 import friend from "./routes/api/friend";
 import earnings from "./routes/api/earnings";
 import connectDB from "./lib/dbConnect";
- import dotenv from "dotenv";
+import dotenv from "dotenv";
 
 dotenv.config();
 const app: Express = express();

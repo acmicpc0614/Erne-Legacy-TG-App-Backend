@@ -29,6 +29,14 @@ const WalletSchema: Schema = new Schema({
     type: Number,
     default: 1,
   },
+  passItemLevel: {
+    type: Number,
+    default: 0,
+  },
+  lastTime: {
+    type: Number,
+    default: Date.now(),
+  },
 });
 const Wallet = model("Wallet", WalletSchema);
 

@@ -1,6 +1,6 @@
 import express, { Router, Request, Response } from "express";
 import Wallet from "../../models/Wallet";
-import { updateLevel } from "../../utils/helper";
+import { getBounsFromPassItem, updateLevel } from "../../utils/helper";
 
 const router: Router = express.Router();
 
@@ -25,27 +25,25 @@ router.post("/add", async (req: Request, res: Response) => {
 
 router.post("/update/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
-  console.log("update =>", req.body);
   updateLevel(req.params.username, req.body.totalPoint);
 
   if (wallet) {
-    const updated_wallet = await Wallet.findOneAndUpdate({
+    const updated_wallet = await Wallet.findOneAndUpdate(
+      {
+        username: req.params.username,
+      },
+      {
+        totalPoint: req.body.totalPoint,
+        balance: req.body.balance,
+        lastTime: Date.now(),
+      }
+    );
+    console.log("--------------update----------");
+    const return_wallet = await Wallet.findOne({
       username: req.params.username,
-      totalPoint: req.body.totalPoint,
-      balance: req.body.balance,
     });
-    console.log("--------------update----------", updated_wallet.level);
-    const return_wallet = {
-      _id: updated_wallet._id,
-      username: updated_wallet.username,
-      totalPoint: req.body.totalPoint,
-      balance: req.body.balance,
-      energy: req.body.energy,
-      tap: updated_wallet.tap,
-      limit: updated_wallet.limit,
-      level: updated_wallet.level,
-    };
-    console.log("updated total =>", return_wallet.totalPoint);
+
+    // console.log("updated total =>", return_wallet);
     return res.status(200).json(return_wallet);
   } else {
     return res.status(400).json({ msg: "You have no permission" });
@@ -59,20 +57,12 @@ router.post("/updateEnergy/:username", async (req: Request, res: Response) => {
     if (wallet) {
       const updated_wallet = await Wallet.findOneAndUpdate(
         { username: req.params.username },
-        { energy: req.body.energy },
-        { new: true } // Ensure the updated document is returned
+        { energy: req.body.energy } // Ensure the updated document is returned
       );
       // console.log("--------------test----------", updated_wallet);
-      const return_wallet = {
-        _id: updated_wallet._id,
-        username: updated_wallet.username,
-        balance: updated_wallet.balance,
-        energy: req.body.energy,
-        tap: updated_wallet.tap,
-        limit: updated_wallet.limit,
-        level: updated_wallet.level,
-        totalPoint: updated_wallet.totalPoint,
-      };
+      const return_wallet = await Wallet.findOne({
+        username: req.params.username,
+      });
       return res.status(200).json(return_wallet);
     } else {
       return res.status(400).json({ msg: "You have no permission" });
@@ -80,6 +70,8 @@ router.post("/updateEnergy/:username", async (req: Request, res: Response) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ msg: "Internal server error" });
+  } finally {
+    // console.log("updateEnergy called =>", Date.now());
   }
 });
 router.post("/updateTap/:username", async (req: Request, res: Response) => {
@@ -91,16 +83,27 @@ router.post("/updateTap/:username", async (req: Request, res: Response) => {
       { tap: req.body.tap }
     );
     //   console.log("--------------test----------",updated_wallet);
-    const return_wallet = {
-      _id: updated_wallet._id,
-      username: updated_wallet.username,
-      balance: updated_wallet.balance,
-      energy: updated_wallet.energy,
-      tap: req.body.tap,
-      limit: updated_wallet.limit,
-      level: updated_wallet.level,
-      totalPoint: updated_wallet.totalPoint,
-    };
+    const return_wallet = await Wallet.findOne({
+      username: req.params.username,
+    });
+    return res.status(200).json(return_wallet);
+  } else {
+    return res.status(400).json({ msg: "You have no permission" });
+  }
+});
+
+router.post("/buyBonusCard/:username", async (req: Request, res: Response) => {
+  const wallet = await Wallet.findOne({ username: req.params.username });
+  console.log("buyBonusCard =>");
+  if (wallet) {
+    const updated_wallet = await Wallet.findOneAndUpdate(
+      { username: req.params.username },
+      { passItemLevel: req.body.passItemLevel }
+    );
+    console.log("--------------test----------", updated_wallet);
+    const return_wallet = await Wallet.findOne({
+      username: req.params.username,
+    });
     return res.status(200).json(return_wallet);
   } else {
     return res.status(400).json({ msg: "You have no permission" });
@@ -116,21 +119,15 @@ router.post("/updateLimit/:username", async (req: Request, res: Response) => {
       { limit: req.body.limit }
     );
     //   console.log("--------------test----------",updated_wallet);
-    const return_wallet = {
-      _id: updated_wallet._id,
-      username: updated_wallet.username,
-      balance: updated_wallet.balance,
-      energy: updated_wallet.energy,
-      tap: updated_wallet.tap,
-      limit: req.body.limit,
-      level: updated_wallet.level,
-      totalPoint: updated_wallet.totalPoint,
-    };
+    const return_wallet = await Wallet.findOne({
+      username: req.params.username,
+    });
     return res.status(200).json(return_wallet);
   } else {
     return res.status(400).json({ msg: "You have no permission" });
   }
 });
+
 router.post("/updateBalance/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
   console.log("updateBalance =>", req.body);
@@ -140,21 +137,15 @@ router.post("/updateBalance/:username", async (req: Request, res: Response) => {
       { balance: req.body.balance }
     );
     //   console.log("--------------test----------",updated_wallet);
-    const return_wallet = {
-      _id: updated_wallet._id,
-      username: updated_wallet.username,
-      balance: req.body.balance,
-      energy: updated_wallet.energy,
-      tap: updated_wallet.tap,
-      limit: updated_wallet.limit,
-      level: updated_wallet.level,
-      totalPoint: updated_wallet.totalPoint,
-    };
+    const return_wallet = await Wallet.findOne({
+      username: req.params.username,
+    });
     return res.status(200).json(return_wallet);
   } else {
     return res.status(400).json({ msg: "You have no permission" });
   }
 });
+
 router.get("/all", async (req: Request, res: Response) => {
   const users = await Wallet.find().limit(5).sort({ totalPoint: -1 });
   res.json(users);

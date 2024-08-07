@@ -38,3 +38,5 @@ export const LevelData = [
 ];
 
 export const PointLimits = [1000, 2000, 3000, 4000, 5000];
+
+export const PassItemCount = [0, 1, 2, 3, 4, 5];

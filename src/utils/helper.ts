@@ -2,7 +2,7 @@
 // import { findConfigurationByIp } from "../models/Surveillance";
 
 import Wallet from "../models/Wallet";
-import { LevelData, PointLimits } from "./levelData";
+import { LevelData, PassItemCount, PointLimits } from "./levelData";
 
 // const fs = require("fs");
 // const path = require("path");
@@ -81,4 +81,13 @@ export const updateLevel = async (username: string, totalPoint: number) => {
     totalPoint: totalPoint,
     level: LevelData[index - 1].level,
   });
+};
+
+export const getPointLimit = () => {
+  return PointLimits[0];
+};
+
+export const getBounsFromPassItem = (level: number, lastTime: number) => {
+  let deltaTime = Math.floor((Date.now() - lastTime) / 1000);
+  return PassItemCount[level] * deltaTime;
 };
