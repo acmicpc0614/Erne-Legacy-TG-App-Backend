@@ -1,19 +1,38 @@
 import express, { Router, Request, Response } from "express";
 import Wallet from "../../models/Wallet";
 import { getBounsFromPassItem, updateLevel } from "../../utils/helper";
+import { PassItemCount } from "../../utils/levelData";
 
 const router: Router = express.Router();
 
 router.post("/add", async (req: Request, res: Response) => {
-  // console.log("----------->wallet---->", req.body);
+  console.log("=======  add =====>");
   const user_new = new Wallet({
     username: req.body.username,
   });
+
   try {
     const { username } = req.body;
     let user_check = await Wallet.findOne({ username });
     if (user_check) {
-      return res.json(user_check);
+      let nowTime = Date.now();
+      // console.log("nowTime =>", nowTime);
+      const passItemEarn =
+        (nowTime - user_check.lastTime) *
+        PassItemCount[user_check.passItemLevel];
+      // console.log("passItemEarn =>", passItemEarn);
+      const updated_wallet = await Wallet.findOneAndUpdate(
+        {
+          username: req.body.username,
+        },
+        {
+          totalPoint: req.body.totalPoint + passItemEarn,
+          balance: req.body.balance + passItemEarn,
+          lastTime: nowTime,
+        }
+      );
+      // console.log("aftTime =>", updated_wallet.lastTime);
+      return res.json(updated_wallet);
     } else {
       await user_new.save();
       res.json(user_new);
@@ -24,21 +43,23 @@ router.post("/add", async (req: Request, res: Response) => {
 });
 
 router.post("/update/:username", async (req: Request, res: Response) => {
+  console.log("=======  update/:username =====>");
   const wallet = await Wallet.findOne({ username: req.params.username });
   updateLevel(req.params.username, req.body.totalPoint);
-
+  const passItemEarn =
+    (Date.now() - wallet.lastTime) * PassItemCount[wallet.passItemLevel];
+  // console.log("passItemEarn =>", passItemEarn);
   if (wallet) {
     const updated_wallet = await Wallet.findOneAndUpdate(
       {
         username: req.params.username,
       },
       {
-        totalPoint: req.body.totalPoint,
-        balance: req.body.balance,
+        totalPoint: req.body.totalPoint + passItemEarn,
+        balance: req.body.balance + passItemEarn,
         lastTime: Date.now(),
       }
     );
-    console.log("--------------update----------");
     const return_wallet = await Wallet.findOne({
       username: req.params.username,
     });
@@ -51,6 +72,7 @@ router.post("/update/:username", async (req: Request, res: Response) => {
 });
 
 router.post("/updateEnergy/:username", async (req: Request, res: Response) => {
+  console.log("=======  updateEnergy/:username =====>");
   try {
     // console.log(req.params.username);
     const wallet = await Wallet.findOne({ username: req.params.username });
@@ -75,8 +97,8 @@ router.post("/updateEnergy/:username", async (req: Request, res: Response) => {
   }
 });
 router.post("/updateTap/:username", async (req: Request, res: Response) => {
+  console.log("=======  updateTap/:username =====>");
   const wallet = await Wallet.findOne({ username: req.params.username });
-  console.log("updateTap =>", req.body);
   if (wallet) {
     const updated_wallet = await Wallet.findOneAndUpdate(
       { username: req.params.username },
@@ -94,11 +116,15 @@ router.post("/updateTap/:username", async (req: Request, res: Response) => {
 
 router.post("/buyBonusCard/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
-  console.log("buyBonusCard =>");
+  console.log("=======  buyBonusCard/:username =====>", wallet);
   if (wallet) {
     const updated_wallet = await Wallet.findOneAndUpdate(
       { username: req.params.username },
-      { passItemLevel: req.body.passItemLevel }
+      {
+        passItemLevel: req.body.passItemLevel,
+        passItemStartTime: Date.now(),
+        balance: req.body.token,
+      }
     );
     console.log("--------------test----------", updated_wallet);
     const return_wallet = await Wallet.findOne({
@@ -106,9 +132,34 @@ router.post("/buyBonusCard/:username", async (req: Request, res: Response) => {
     });
     return res.status(200).json(return_wallet);
   } else {
+    console.log("there is no wallet");
     return res.status(400).json({ msg: "You have no permission" });
   }
 });
+
+router.post(
+  "/removeBonusCard/:username",
+  async (req: Request, res: Response) => {
+    const wallet = await Wallet.findOne({ username: req.params.username });
+    console.log("=======  removeBonusCard/:username =====>", wallet);
+    if (wallet) {
+      const updated_wallet = await Wallet.findOneAndUpdate(
+        { username: req.params.username },
+        {
+          passItemLevel: 0,
+        }
+      );
+      console.log("--------------removeBonusCard----------", updated_wallet);
+      const return_wallet = await Wallet.findOne({
+        username: req.params.username,
+      });
+      return res.status(200).json(return_wallet);
+    } else {
+      console.log("there is no wallet");
+      return res.status(400).json({ msg: "You have no permission" });
+    }
+  }
+);
 
 router.post("/updateLimit/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
@@ -147,7 +198,7 @@ router.post("/updateBalance/:username", async (req: Request, res: Response) => {
 });
 
 router.get("/all", async (req: Request, res: Response) => {
-  const users = await Wallet.find().limit(5).sort({ totalPoint: -1 });
+  const users = await Wallet.find().limit(10).sort({ totalPoint: -1 });
   res.json(users);
 });
 router.post("/:username", async (req: Request, res: Response) => {

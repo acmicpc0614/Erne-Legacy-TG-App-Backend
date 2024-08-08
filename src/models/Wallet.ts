@@ -33,6 +33,10 @@ const WalletSchema: Schema = new Schema({
     type: Number,
     default: 0,
   },
+  passItemStartTime: {
+    type: Number,
+    default: 0,
+  },
   lastTime: {
     type: Number,
     default: Date.now(),
