@@ -116,7 +116,7 @@ router.post("/updateTap/:username", async (req: Request, res: Response) => {
 
 router.post("/buyBonusCard/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
-  console.log("=======  buyBonusCard/:username =====>", wallet);
+  // console.log("=======  buyBonusCard/:username =====>", wallet);
   if (wallet) {
     const updated_wallet = await Wallet.findOneAndUpdate(
       { username: req.params.username },
@@ -126,7 +126,7 @@ router.post("/buyBonusCard/:username", async (req: Request, res: Response) => {
         balance: req.body.token,
       }
     );
-    console.log("--------------test----------", updated_wallet);
+    // console.log("--------------test----------", updated_wallet);
     const return_wallet = await Wallet.findOne({
       username: req.params.username,
     });
@@ -141,15 +141,17 @@ router.post(
   "/removeBonusCard/:username",
   async (req: Request, res: Response) => {
     const wallet = await Wallet.findOne({ username: req.params.username });
-    console.log("=======  removeBonusCard/:username =====>", wallet);
+    // console.log("=======  removeBonusCard/:username =====>", wallet);
     if (wallet) {
       const updated_wallet = await Wallet.findOneAndUpdate(
         { username: req.params.username },
         {
           passItemLevel: 0,
+          totalPoint: req.body.total,
+          balance: req.body.token,
         }
       );
-      console.log("--------------removeBonusCard----------", updated_wallet);
+      // console.log("--------------removeBonusCard----------", updated_wallet);/
       const return_wallet = await Wallet.findOne({
         username: req.params.username,
       });
@@ -160,6 +162,34 @@ router.post(
     }
   }
 );
+
+router.post("/getDailyEarn/:username", async (req: Request, res: Response) => {
+  const wallet = await Wallet.findOne({ username: req.params.username });
+  console.log("=======  getDailyEarn =====>");
+  const DAY = 86400 * 1000;
+  const TESTMINUTE = 10 * 1000; // 10s
+  if (wallet && Date.now() - wallet.dailyEarnTime > DAY) {
+    const updated_wallet = await Wallet.findOneAndUpdate(
+      { username: req.params.username },
+      {
+        totalPoint: wallet.totalPoint + 1000,
+        balance: wallet.balance + 1000,
+        dailyEarnTime: Date.now() - (Date.now() % DAY),
+      }
+    );
+    console.log(
+      "--------------getDailyEarn----------",
+      updated_wallet.dailyEarnTime
+    );
+    const return_wallet = await Wallet.findOne({
+      username: req.params.username,
+    });
+    return res.status(200).json(return_wallet);
+  } else {
+    console.log("there is no wallet");
+    return res.status(204).json({ msg: "You have no permission" });
+  }
+});
 
 router.post("/updateLimit/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });

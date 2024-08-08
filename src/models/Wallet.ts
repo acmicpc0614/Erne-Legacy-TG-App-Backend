@@ -41,6 +41,10 @@ const WalletSchema: Schema = new Schema({
     type: Number,
     default: Date.now(),
   },
+  dailyEarnTime: {
+    type: Number,
+    default: 0,
+  },
 });
 const Wallet = model("Wallet", WalletSchema);
 
