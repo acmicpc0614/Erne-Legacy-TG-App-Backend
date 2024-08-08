@@ -167,7 +167,7 @@ router.post("/getDailyEarn/:username", async (req: Request, res: Response) => {
   const wallet = await Wallet.findOne({ username: req.params.username });
   console.log("=======  getDailyEarn =====>");
   const DAY = 86400 * 1000;
-  const TESTMINUTE = 10 * 1000; // 10s
+  const TESTMINUTE = 20 * 1000; // 10s
   if (wallet && Date.now() - wallet.dailyEarnTime > DAY) {
     const updated_wallet = await Wallet.findOneAndUpdate(
       { username: req.params.username },
