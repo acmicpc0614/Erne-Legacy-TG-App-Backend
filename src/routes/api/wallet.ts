@@ -6,13 +6,13 @@ import { PassItemCount } from "../../utils/levelData";
 const router: Router = express.Router();
 
 router.post("/add", async (req: Request, res: Response) => {
-  console.log("=======  add =====>");
   const user_new = new Wallet({
     username: req.body.username,
   });
 
   try {
     const { username } = req.body;
+    console.log("=======  add =====>", username);
     let user_check = await Wallet.findOne({ username });
     if (user_check) {
       let nowTime = Date.now();
@@ -26,8 +26,8 @@ router.post("/add", async (req: Request, res: Response) => {
           username: req.body.username,
         },
         {
-          totalPoint: req.body.totalPoint + passItemEarn,
-          balance: req.body.balance + passItemEarn,
+          totalPoint: req.body.totalPoint ?? 0,
+          balance: req.body.balance ?? 0 + passItemEarn,
           lastTime: nowTime,
         }
       );
