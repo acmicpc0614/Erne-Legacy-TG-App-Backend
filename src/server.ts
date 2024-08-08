@@ -21,7 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/static", express.static(__dirname + "/public"));
+// app.use("/static", express.static(__dirname + "./dist"));
 
 app.use("/api/user", user);
 app.use("/api/wallet", wallet);
@@ -37,14 +37,24 @@ app.get("/api/get-suv-version", (req, res) => {
   );
 });
 
-if (process.env.ENVIRONMENT === "PRODUCTION") {
-  console.log("Production requested");
-  app.use(express.static(path.join(__dirname, "build", "index.html")));
+// if (process.env.ENVIRONMENT === "PRODUCTION") {
+console.log("Production requested");
+app.use(
+  express.static(
+    path.join(__dirname, "./../../Erne-Legacy-Telegram-App-Frontend/dist")
+  )
+);
 
-  app.get("/*", async (req, res) => {
-    res.sendFile(path.join(__dirname, "build", "index.html"));
-  });
-}
+app.get("/*", async (req, res) => {
+  res.sendFile(
+    path.join(
+      __dirname,
+      "./../../Erne-Legacy-Telegram-App-Frontend/dist",
+      "index.html"
+    )
+  );
+});
+// }
 
 app.listen(port, () => {
   console.log(`Server is listening on ${port}`);
