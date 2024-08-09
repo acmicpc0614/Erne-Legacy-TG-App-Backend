@@ -26,8 +26,8 @@ router.post("/add", async (req: Request, res: Response) => {
           username: req.body.username,
         },
         {
-          totalPoint: req.body.totalPoint ?? 0,
-          balance: req.body.balance ?? 0 + passItemEarn,
+          totalPoint: req.body.totalPoint,
+          balance: req.body.balance + passItemEarn,
           lastTime: nowTime,
         }
       );
@@ -228,7 +228,8 @@ router.post("/updateBalance/:username", async (req: Request, res: Response) => {
 });
 
 router.get("/all", async (req: Request, res: Response) => {
-  const users = await Wallet.find().limit(10).sort({ totalPoint: -1 });
+  // const users = await Wallet.find().limit(8).sort({ totalPoint: -1 });
+  const users = await Wallet.find().sort({ totalPoint: -1 });
   res.json(users);
 });
 router.post("/:username", async (req: Request, res: Response) => {
