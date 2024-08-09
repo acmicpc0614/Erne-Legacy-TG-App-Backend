@@ -1,5 +1,6 @@
 import express, { Router, Request, Response } from "express";
 import Wallet from "../../models/Wallet";
+import Friend from "../../models/Friend";
 import {
   getBounsFromPassItem,
   isExistUser,
@@ -23,9 +24,20 @@ router.post("/add", async (req: Request, res: Response) => {
       console.log("error while saving user", error);
     }
   } else {
-    const newUser = new Wallet({
-      username: username,
-    });
+    const isFriend = await Friend.findOne({ friend: username });
+    let newUser;
+
+    if (isFriend) {
+      newUser = new Wallet({
+        username: username,
+        totalPoint: 1000,
+        balance: 1000
+      });
+    } else {
+      newUser = new Wallet({
+        username: username,
+      });
+    }
     // console.log("new user saved as", username);
     await newUser.save();
     res.json(newUser);

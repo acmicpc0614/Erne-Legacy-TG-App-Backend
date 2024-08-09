@@ -19,19 +19,11 @@ router.post("/add", async (req: Request, res: Response) => {
     } else {
       await friend_new.save();
       const wallet = await Wallet.findOne({ username: req.body.username });
-      const wallet_friend = await Wallet.findOne({ username: req.body.friend });
       const updated_wallet = await Wallet.findOneAndUpdate(
         { username: req.body.username },
         {
           totalPoint: wallet.totalPoint + 1000,
           balance: wallet.balance + 1000
-        }
-      );
-      const updated_wallet_friend = await Wallet.findOneAndUpdate(
-        { username: req.body.friend },
-        {
-          totalPoint: wallet_friend.totalPoint + 1000,
-          balance: wallet_friend.balance + 1000
         }
       );
       res.json(friend_new);
