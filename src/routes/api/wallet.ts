@@ -46,17 +46,16 @@ router.post("/update/:username", async (req: Request, res: Response) => {
   console.log("=======  update/:username =====>");
   const wallet = await Wallet.findOne({ username: req.params.username });
   updateLevel(req.params.username, req.body.totalPoint);
-  const passItemEarn =
-    (Date.now() - wallet.lastTime) * PassItemCount[wallet.passItemLevel];
-  // console.log("passItemEarn =>", passItemEarn);
+  // const passItemEarn =
+  //   (Date.now() - wallet.lastTime) * PassItemCount[wallet.passItemLevel];
   if (wallet) {
     const updated_wallet = await Wallet.findOneAndUpdate(
       {
         username: req.params.username,
       },
       {
-        totalPoint: req.body.totalPoint + passItemEarn,
-        balance: req.body.balance + passItemEarn,
+        totalPoint: req.body.totalPoint,
+        balance: req.body.balance,
         lastTime: Date.now(),
       }
     );
@@ -64,7 +63,7 @@ router.post("/update/:username", async (req: Request, res: Response) => {
       username: req.params.username,
     });
 
-    // console.log("updated total =>", return_wallet);
+    console.log("updated total =>", return_wallet.totalPoint);
     return res.status(200).json(return_wallet);
   } else {
     return res.status(400).json({ msg: "You have no permission" });
@@ -231,7 +230,7 @@ router.get("/all", async (req: Request, res: Response) => {
   console.log("-------------- all ----------");
   // const users = await Wallet.find().limit(8).sort({ totalPoint: -1 });
   const users = await Wallet.find().sort({ totalPoint: -1 });
-  console.log(Date.now(), users.length);
+  // console.log(Date.now(), users.length);
   res.json(users);
 });
 router.post("/:username", async (req: Request, res: Response) => {
