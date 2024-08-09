@@ -14,7 +14,7 @@ router.post("/add", async (req: Request, res: Response) => {
     const { username } = req.body;
     console.log("=======  add =====>", username);
     let user_check = await Wallet.findOne({ username });
-    if (user_check) {
+    if (user_check && username) {
       let nowTime = Date.now();
       // console.log("nowTime =>", nowTime);
       const passItemEarn =
@@ -228,8 +228,10 @@ router.post("/updateBalance/:username", async (req: Request, res: Response) => {
 });
 
 router.get("/all", async (req: Request, res: Response) => {
+  console.log("-------------- all ----------");
   // const users = await Wallet.find().limit(8).sort({ totalPoint: -1 });
   const users = await Wallet.find().sort({ totalPoint: -1 });
+  console.log(Date.now(), users.length);
   res.json(users);
 });
 router.post("/:username", async (req: Request, res: Response) => {
