@@ -34,7 +34,7 @@ router.post("/add", async (req: Request, res: Response) => {
 
 router.post("/update/:username", async (req: Request, res: Response) => {
   console.log("=======  update/:username =====>", req.params.username);
-  const { totalPoint, balance } = req.body;
+  const { totalPoint, balance, energy } = req.body;
   const username = req.params.username;
   const isExist = await Wallet.findOne({ username: username });
   if (isExist) {
@@ -43,9 +43,10 @@ router.post("/update/:username", async (req: Request, res: Response) => {
       {
         totalPoint: totalPoint,
         balance: balance,
+        energy: energy,
       }
     );
-    console.log("update user updated_wallet =>", updated_wallet.balance);
+    console.log("update user updated_wallet =>", updated_wallet.energy);
     res.json(updated_wallet);
   } else {
     // console.log("in update req, user does not exist", username);
@@ -157,7 +158,7 @@ router.post("/getDailyEarn/:username", async (req: Request, res: Response) => {
   const { username } = req.params;
 
   const AMOUTDAY = 1000;
-  const DAY = 10 * 1000;
+  const DAY = 20 * 1000;
   // const DAY = 86400 * 1000;
 
   try {
