@@ -91,3 +91,9 @@ export const getBounsFromPassItem = (level: number, lastTime: number) => {
   let deltaTime = Math.floor((Date.now() - lastTime) / 1000);
   return PassItemCount[level] * deltaTime;
 };
+
+export const isExistUser = async (username: string) => {
+  const isExist = await Wallet.findOne({ username: username });
+  if (isExist !== null) return true;
+  else return false;
+};
