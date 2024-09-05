@@ -80,6 +80,7 @@ router.post(
   }
 );
 router.post("/:username", async (req: Request, res: Response) => {
+  console.log("earning/:username");
   let user = await Earnings.findOne({ username: req.params.username });
   if (user) {
     res.json(user);

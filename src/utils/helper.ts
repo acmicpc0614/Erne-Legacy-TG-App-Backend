@@ -64,7 +64,7 @@ import { LevelData, PassItemCount, PointLimits } from "./levelData";
 
 // export const upload = multer({ storage });
 
-function lowerBound(arr: any[], target: number): number {
+export function lowerBound(arr: any[], target: number): number {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].totalPoint >= target) {
       return arr[i].level;
@@ -75,7 +75,7 @@ function lowerBound(arr: any[], target: number): number {
 
 export const updateLevel = async (username: string, totalPoint: number) => {
   const index: number = lowerBound(LevelData, totalPoint);
-
+  // level: LevelData[index - 1].level,
   await Wallet.findOneAndUpdate({
     username: username,
     totalPoint: totalPoint,

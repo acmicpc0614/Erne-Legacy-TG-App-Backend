@@ -4,9 +4,10 @@ import Friend from "../../models/Friend";
 import {
   getBounsFromPassItem,
   isExistUser,
+  lowerBound,
   updateLevel,
 } from "../../utils/helper";
-import { PassItemCount } from "../../utils/levelData";
+import { LevelData, PassItemCount } from "../../utils/levelData";
 
 const router: Router = express.Router();
 
@@ -31,7 +32,7 @@ router.post("/add", async (req: Request, res: Response) => {
       newUser = new Wallet({
         username: username,
         totalPoint: 1000,
-        balance: 1000
+        balance: 1000,
       });
     } else {
       newUser = new Wallet({
@@ -50,16 +51,19 @@ router.post("/update/:username", async (req: Request, res: Response) => {
   const username = req.params.username;
   const isExist = await Wallet.findOne({ username: username });
   if (isExist) {
+    const index: number = lowerBound(LevelData, totalPoint);
+
     const updated_wallet = await Wallet.findOneAndUpdate(
       { username: username },
       {
         totalPoint: totalPoint,
         balance: balance,
         energy: energy,
+        level: LevelData[index - 1].level,
       }
     );
-    console.log("update user updated_wallet =>", updated_wallet.energy);
-    res.json(updated_wallet);
+    res.status(200).json(updated_wallet);
+    // console.log("update user updated_wallet =>", updated_wallet.level);
   } else {
     // console.log("in update req, user does not exist", username);
     res.status(400).json({ msg: "User does not exist" });
